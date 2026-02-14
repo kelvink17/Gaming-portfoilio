@@ -1,40 +1,59 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import SkillsSection from './SkillsSection'
-import ProjectsMission from './ProjectsMission'
-import ContactPage from './ContactPage'
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import SkillsSection from "./SkillsSection";
+import ProjectsMission from "./ProjectsMission";
+import ContactPage from "./ContactPage";
 
-type PageType = 'skills' | 'projects' | 'contact'
+type PageType = "skills" | "projects" | "contact";
 
 interface DashboardProps {
-  transitionComplete: boolean
+  transitionComplete: boolean;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
-  const [currentPage, setCurrentPage] = useState<PageType>('skills')
+  const [currentPage, setCurrentPage] = useState<PageType>("skills");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // --- AUDIO LOGIC ---
+  const playExitSound = () => {
+    // Ensure you have exit.mp3 in public/sounds/
+    const audio = new Audio("/sounds/exit.mp3");
+    audio.volume = 0.4;
+    audio
+      .play()
+      .catch((e) =>
+        console.log("Audio play blocked until user interaction", e),
+      );
+  };
+
+  const handleExit = () => {
+    playExitSound();
+    // Short delay to let the sound play before navigation
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 400);
+  };
 
   const menuItems = [
-    { id: 'skills', label: 'Skills & Stack', icon: '⚡' },
-    { id: 'projects', label: 'Mission Select', icon: '🎮' },
-    { id: 'contact', label: 'Protocol', icon: '📡' },
-  ]
+    { id: "skills", label: "Skills & Stack", icon: "⚡" },
+    { id: "projects", label: "Mission Select", icon: "🎮" },
+    { id: "contact", label: "Protocol", icon: "📡" },
+  ];
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'skills':
-        return <SkillsSection />
-      case 'projects':
-        return <ProjectsMission />
-      case 'contact':
-        return <ContactPage />
+      case "skills":
+        return <SkillsSection />;
+      case "projects":
+        return <ProjectsMission />;
+      case "contact":
+        return <ContactPage />;
       default:
-        return <SkillsSection />
+        return <SkillsSection />;
     }
-  }
-
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  };
 
   return (
     <div className="w-full h-screen bg-dark text-white overflow-hidden flex flex-col">
@@ -44,7 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded bg-neon-cyan/10 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/20"
         >
-          {sidebarOpen ? '✕' : '☰'}
+          {sidebarOpen ? "✕" : "☰"}
         </button>
       </div>
 
@@ -53,84 +72,160 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
         className="fixed left-0 top-0 h-full w-full md:w-64 bg-dark-secondary border-r border-neon-cyan/20 z-40 
           flex flex-col p-6 gap-8 md:gap-12 overflow-y-auto"
         initial={{ x: -400 }}
-        animate={transitionComplete && (sidebarOpen || typeof window !== 'undefined' && window.innerWidth >= 768) ? { x: 0 } : { x: -400 }}
-        transition={{ duration: 0.8, type: 'spring' }}
+        animate={
+          transitionComplete &&
+          (sidebarOpen ||
+            (typeof window !== "undefined" && window.innerWidth >= 768))
+            ? { x: 0 }
+            : { x: -400 }
+        }
+        transition={{ duration: 0.8, type: "spring" }}
       >
-        {/* Logo */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold font-mono text-neon-cyan">NEXUS</h2>
-          <p className="text-xs text-gray-500 mt-1">v1.0.0</p>
+        {/* --- PLAYER PROFILE WIDGET --- */}
+        <div className="flex flex-col items-center gap-4 py-4 border-b border-neon-cyan/10">
+          <div className="relative group cursor-crosshair">
+            {/* HUD Rotating Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="absolute -inset-2 border border-dashed border-neon-cyan/40 rounded-full"
+            />
+
+            {/* Circular Profile Frame */}
+            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-neon-cyan p-1 bg-dark shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+              <img
+                src="../public/Rema grillz.jpg"
+                alt="Player Avatar"
+                className="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500"
+              />
+            </div>
+
+            {/* Live Indicator */}
+            <div className="absolute bottom-1 right-1 w-4 h-4 bg-neon-green border-2 border-dark-secondary rounded-full animate-pulse shadow-[0_0_10px_#39ff14]"></div>
+          </div>
+
+          <div className="text-center">
+            <h2 className="text-lg font-bold font-mono text-white tracking-tighter uppercase">
+              PLAYER_ONE
+            </h2>
+            <p className="text-[10px] text-neon-cyan font-mono opacity-70 tracking-widest uppercase">
+              Rank: Master Architect
+            </p>
+          </div>
+
+          {/* EXIT ARENA BUTTON (Back to Landing) */}
+          <motion.button
+            onClick={handleExit}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0_0_20px_rgba(255,0,110,0.4)",
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-2 flex items-center gap-2 px-4 py-1.5 rounded-full border border-neon-pink/40 
+              text-[10px] font-mono text-neon-pink hover:bg-neon-pink/10 transition-all uppercase tracking-[0.2em] group"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ↩
+            </span>{" "}
+            EXIT_ARENA
+          </motion.button>
         </div>
 
-        {/* Menu */}
+        {/* Navigation Menu */}
         <nav className="flex flex-col gap-4 flex-1">
           {menuItems.map((item, index) => (
             <motion.button
               key={item.id}
               onClick={() => {
-                setCurrentPage(item.id as PageType)
-                setSidebarOpen(false)
+                setCurrentPage(item.id as PageType);
+                setSidebarOpen(false);
               }}
               className={`relative px-4 py-3 text-left font-mono text-sm uppercase tracking-wider transition-all duration-300 
-                ${currentPage === item.id ? 'text-neon-cyan' : 'text-gray-400 hover:text-neon-cyan'}`}
+                ${currentPage === item.id ? "text-neon-cyan bg-neon-cyan/5" : "text-gray-400 hover:text-neon-cyan hover:bg-white/5"}`}
               initial={{ opacity: 0, x: -20 }}
-              animate={transitionComplete ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+              animate={
+                transitionComplete
+                  ? { opacity: 1, x: 0 }
+                  : { opacity: 0, x: -20 }
+              }
               transition={{ delay: index * 0.1 + 0.5 }}
-              whileHover={{ x: 10 }}
+              whileHover={{ x: 5 }}
             >
-              <span className="mr-2">{item.icon}</span>
+              <span className="mr-3">{item.icon}</span>
               {item.label}
               {currentPage === item.id && (
                 <motion.div
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-neon-cyan"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-neon-cyan shadow-[0_0_10px_#00d4ff]"
                   layoutId="indicator"
-                  transition={{ type: 'spring', bounce: 0.2 }}
+                  transition={{ type: "spring", bounce: 0.2 }}
                 ></motion.div>
               )}
             </motion.button>
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="text-xs text-gray-600 text-center">
-          <p>[ NEURAL LINK ACTIVE ]</p>
-          <p className="mt-2">© 2024 - All Systems Go</p>
+        {/* Sidebar Footer */}
+        <div className="text-[10px] text-gray-600 font-mono text-center pb-4">
+          <p className="animate-pulse tracking-widest text-neon-cyan/40">
+            [ NEURAL LINK ACTIVE ]
+          </p>
+          <p className="mt-2 opacity-50">EST. 2026 // NODE_v22.4</p>
         </div>
       </motion.div>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <motion.div
-        className="w-full h-full md:ml-64 overflow-y-auto"
+        className="w-full h-full md:ml-64 overflow-y-auto relative scrollbar-hide"
         initial={{ opacity: 0 }}
         animate={transitionComplete ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <div className="p-6 md:p-12 min-h-screen">
-          {renderPage()}
+        <div className="p-6 md:p-12 min-h-screen max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPage}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              {renderPage()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </motion.div>
 
-      {/* Scan Lines */}
-      <div className="fixed inset-0 pointer-events-none z-20 scan-lines opacity-5"></div>
+      {/* CRT Scanline Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-50 scan-lines opacity-[0.03]"></div>
 
-      {/* Status Bar */}
+      {/* Bottom Interface Status Bar */}
       <motion.div
-        className="fixed bottom-0 left-0 right-0 h-10 bg-dark-secondary/80 border-t border-neon-cyan/20
-          flex items-center justify-between px-6 text-xs font-mono text-gray-500 z-30"
+        className="fixed bottom-0 left-0 right-0 h-10 bg-dark-secondary/90 backdrop-blur-md border-t border-neon-cyan/20
+          flex items-center justify-between px-6 text-[10px] font-mono text-gray-500 z-30"
         initial={{ y: 100 }}
         animate={transitionComplete ? { y: 0 } : { y: 100 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></span>
-            SYSTEM ONLINE
+          <span className="flex items-center gap-2 text-neon-green">
+            <span className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse"></span>
+            SYSTEM_STABLE
+          </span>
+          <span className="hidden lg:inline border-l border-white/10 pl-4 tracking-tighter">
+            PING: 12ms
+          </span>
+          <span className="hidden lg:inline tracking-tighter">
+            LOC: LAGOS_NGA
           </span>
         </div>
-        <span>CPU: 24% | RAM: 42%</span>
+        <div className="flex gap-6 uppercase">
+          <span className="hidden sm:inline">GPU_LOAD: 14%</span>
+          <span className="text-neon-purple">MEM_POOL: 42%</span>
+          <span className="text-neon-cyan animate-pulse">SYNC_OK</span>
+        </div>
       </motion.div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

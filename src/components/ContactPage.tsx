@@ -87,10 +87,10 @@ const ContactPage: React.FC = () => {
           <div className="glass-effect rounded-lg p-6 border border-neon-cyan/20 hover:border-neon-cyan/60 transition-all duration-300">
             <h3 className="text-neon-cyan font-mono font-bold mb-2">EMAIL</h3>
             <a
-              href="mailto:your.email@example.com"
+              href="mailto:kelvinkokorie@gmail.com"
               className="text-white hover:text-neon-cyan transition-colors"
             >
-              your.email@example.com
+              kelvinkokorie@gmail.com
             </a>
           </div>
 
