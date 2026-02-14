@@ -94,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
             {/* Circular Profile Frame */}
             <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-neon-cyan p-1 bg-dark shadow-[0_0_15px_rgba(0,212,255,0.3)]">
               <img
-                src="../public/3.jpeg"
+                src="/public/3.jpeg"
                 alt="Player Avatar"
                 className="w-full h-full object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-500"
               />
