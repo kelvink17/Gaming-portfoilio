@@ -8,8 +8,8 @@ interface Skill {
   name: string;
   level: number;
   icon: string;
-  color: string; // Tailwind gradient class
-  hex: string; // Hex code for Framer Motion animations
+  color: string;
+  hex: string;
 }
 
 const SkillsSection: React.FC = () => {
@@ -64,43 +64,95 @@ const SkillsSection: React.FC = () => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
     },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="mb-12"
-      >
-        <h1
-          className="text-4xl md:text-5xl font-bold font-mono text-transparent bg-clip-text
-          bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink mb-4"
+    <div className="w-full space-y-12 pb-20">
+      {/* --- NEW PROFILE & HEADER SECTION --- */}
+      <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
+        {/* GAMING PLAYER CARD */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative w-full max-w-[320px] group"
         >
-          COMBAT STATS
-        </h1>
-        <p className="text-gray-400 text-sm md:text-base">
-          [ NEURAL INTERFACE - SKILL ANALYSIS COMPLETE ]
-        </p>
-      </motion.div>
+          {/* Cyberpunk Decorative Corners */}
+          <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-neon-cyan z-20" />
+          <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-neon-pink z-20" />
 
-      {/* Skills Grid */}
+          <div className="relative overflow-hidden rounded-lg border border-white/10 glass-effect p-2">
+            {/* THE IMAGE - Replace 'me.png' with your actual filename */}
+            <img
+              src="/me.png"
+              alt="Player Profile"
+              className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-500 rounded-md"
+            />
+
+            {/* Animated Scanning Line */}
+            <motion.div
+              animate={{ top: ["0%", "100%", "0%"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="absolute left-0 w-full h-[2px] bg-neon-cyan/50 shadow-[0_0_15px_#00d4ff] z-10 pointer-events-none"
+            />
+
+            {/* HUD Status Overlay */}
+            <div className="absolute bottom-4 left-4 right-4 z-20">
+              <div className="bg-black/80 backdrop-blur-md p-3 border-l-4 border-neon-cyan">
+                <p className="text-[10px] font-mono text-neon-cyan uppercase tracking-widest">
+                  System Status
+                </p>
+                <p className="text-lg font-bold font-mono text-white italic">
+                  LVL 99 MASTER
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ORIGINAL HEADER TEXT */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="flex-1 text-center lg:text-left"
+        >
+          <h1
+            className="text-4xl md:text-6xl font-bold font-mono text-transparent bg-clip-text
+            bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink mb-4"
+          >
+            COMBAT STATS
+          </h1>
+          <p className="text-gray-400 text-sm md:text-base font-mono mb-8">
+            [ NEURAL INTERFACE - SKILL ANALYSIS COMPLETE ]
+          </p>
+
+          {/* New HUD Mini-Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-mono uppercase tracking-wider">
+            <div className="p-2 border border-neon-cyan/20 bg-neon-cyan/5 text-neon-cyan">
+              Rank: S-Tier
+            </div>
+            <div className="p-2 border border-neon-purple/20 bg-neon-purple/5 text-neon-purple">
+              Class: Fullstack
+            </div>
+            <div className="p-2 border border-neon-pink/20 bg-neon-pink/5 text-neon-pink">
+              Role: Architect
+            </div>
+            <div className="p-2 border border-neon-green/20 bg-neon-green/5 text-neon-green">
+              Status: Online
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* --- SKILLS GRID (Your Original Logic) --- */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         variants={containerVariants}
@@ -116,20 +168,16 @@ const SkillsSection: React.FC = () => {
             className="group relative"
           >
             <motion.div
-              className="glass-effect rounded-lg p-6 cursor-pointer border-2 border-transparent
-                transition-all duration-300"
+              className="glass-effect rounded-lg p-6 cursor-pointer border-2 border-transparent transition-all duration-300"
               whileHover={{
                 borderColor: skill.hex,
-                boxShadow: `0 0 25px ${skill.hex}44`, // The "44" adds slight transparency
+                boxShadow: `0 0 25px ${skill.hex}44`,
               }}
             >
-              {/* Glow Background */}
               <div
-                className={`absolute inset-0 rounded-lg bg-gradient-to-br ${skill.color} to-transparent 
-                  opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                className={`absolute inset-0 rounded-lg bg-gradient-to-br ${skill.color} to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
               ></div>
 
-              {/* Content */}
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold font-mono text-white">
@@ -139,12 +187,10 @@ const SkillsSection: React.FC = () => {
                     {skill.level}%
                   </span>
                 </div>
-
                 <h4 className="text-lg font-bold text-white mb-4">
                   {skill.name}
                 </h4>
 
-                {/* Experience Bar */}
                 <div className="relative h-2 bg-dark-secondary rounded-full overflow-hidden border border-neon-cyan/20">
                   <motion.div
                     className={`h-full bg-gradient-to-r ${skill.color} to-neon-pink rounded-full`}
@@ -155,7 +201,6 @@ const SkillsSection: React.FC = () => {
                   ></motion.div>
                 </div>
 
-                {/* Level Display */}
                 <motion.p
                   className="text-xs text-gray-400 mt-3 font-mono"
                   initial={{ opacity: 0.5 }}
@@ -174,7 +219,7 @@ const SkillsSection: React.FC = () => {
         ))}
       </motion.div>
 
-      {/* Stats Summary */}
+      {/* --- STATS SUMMARY --- */}
       <motion.div
         className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4"
         initial={{ opacity: 0, y: 20 }}
@@ -190,12 +235,9 @@ const SkillsSection: React.FC = () => {
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
-            className="glass-effect rounded-lg p-4 border border-neon-cyan/20"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            viewport={{ once: true }}
+            className="glass-effect rounded-lg p-4 border border-neon-cyan/20 text-center"
             whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
           >
             <p className="text-gray-400 text-xs font-mono">{stat.label}</p>
             <p className="text-2xl md:text-3xl font-bold text-neon-cyan mt-2">
@@ -205,7 +247,7 @@ const SkillsSection: React.FC = () => {
         ))}
       </motion.div>
 
-      {/* Football Interactive Section */}
+      {/* --- FOOTBALL SECTION --- */}
       <motion.div
         className="mt-12"
         initial={{ opacity: 0, y: 20 }}
@@ -222,7 +264,7 @@ const SkillsSection: React.FC = () => {
         <FootballAnimation onGoal={() => console.log("[v0] Goal scored!")} />
       </motion.div>
 
-      {/* About Me Section */}
+      {/* --- ABOUT SYSTEM SECTION --- */}
       <motion.div
         className="mt-12 glass-effect rounded-lg p-8 border border-neon-cyan/20"
         initial={{ opacity: 0, y: 20 }}
@@ -240,8 +282,7 @@ const SkillsSection: React.FC = () => {
         </p>
         <p className="text-gray-300 leading-relaxed">
           My passion is creating experiences that make people say "wow"—whether
-          it's interactive web platforms, real-time applications, or innovative
-          digital solutions. Every project is a mission to push boundaries.
+          it's interactive web platforms or innovative digital solutions.
         </p>
       </motion.div>
     </div>
