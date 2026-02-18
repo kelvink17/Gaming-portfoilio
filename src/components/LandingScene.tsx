@@ -96,7 +96,7 @@ function RotatingMesh() {
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     loader.load(
-      "/public/Rema grillz",
+      "/Rema grillz",
       (tex) => {
         setTexture(tex);
       },

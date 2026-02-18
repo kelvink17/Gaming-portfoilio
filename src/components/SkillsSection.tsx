@@ -91,7 +91,7 @@ const SkillsSection: React.FC = () => {
           <div className="relative overflow-hidden rounded-lg border border-white/10 glass-effect p-2">
             {/* THE IMAGE - Replace 'me.png' with your actual filename */}
             <img
-              src="public/4.jpeg"
+              src="/4.jpeg"
               alt="Player Profile"
               className="w-full h-auto object-cover grayscale group-hover:grayscale-0 transition-all duration-500 rounded-md"
             />
