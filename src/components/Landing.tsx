@@ -37,7 +37,7 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
     animate: {
       textShadow: [
         "0 0 0 transparent",
-        "2px 2px 0 #00d4ff, -2px -2px 0 #b026ff",
+        "3px 3px 0 #00d4ff, -3px -3px 0 #b026ff",
         "0 0 0 transparent",
       ],
       transition: { duration: 0.3, repeat: Infinity, repeatDelay: 2 },
@@ -67,14 +67,14 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
         {/* Main Title */}
         <motion.div variants={itemVariants} className="text-center mb-8">
           <motion.h1
-            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 font-mono"
+            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 font-mono text-white drop-shadow-[0_0_15px_rgba(0,212,255,0.7)]"
             variants={glitchVariants}
             animate="animate"
           >
             PORTFOLIO
           </motion.h1>
           <motion.div
-            className="h-1 w-32 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink mx-auto"
+            className="h-1 w-32 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-pink mx-auto shadow-[0_0_10px_rgba(0,212,255,0.5)]"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -84,7 +84,7 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
         {/* Subtitle */}
         <motion.p
           variants={itemVariants}
-          className="text-lg md:text-2xl text-neon-cyan mb-4 font-mono max-w-2xl"
+          className="text-lg md:text-2xl text-neon-cyan mb-4 font-mono max-w-2xl drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]"
         >
           An Experience, Not a Resume.
         </motion.p>
@@ -92,7 +92,7 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
         {/* Tagline */}
         <motion.p
           variants={itemVariants}
-          className="text-sm md:text-base text-gray-400 mb-12 max-w-2xl text-center"
+          className="text-sm md:text-base text-gray-300 mb-12 max-w-2xl text-center drop-shadow-md"
         >
           Step into an immersive digital journey. Witness 3D environments,
           interactive missions, and a football-fueled showcase of skills.
@@ -104,7 +104,8 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
           onClick={onEnter}
           className="relative px-8 md:px-12 py-3 md:py-4 text-base md:text-lg font-bold font-mono uppercase tracking-widest
             border-2 border-neon-cyan text-neon-cyan hover:text-dark
-            transition-all duration-300 overflow-hidden group cursor-pointer"
+            transition-all duration-300 overflow-hidden group cursor-pointer
+            shadow-[0_0_15px_rgba(0,212,255,0.5)] hover:shadow-[0_0_25px_rgba(0,212,255,0.8)]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -115,17 +116,19 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
         {/* Bottom Info */}
         <motion.div
           variants={itemVariants}
-          className="absolute bottom-8 text-center text-xs md:text-sm text-gray-500 font-mono"
+          className="absolute bottom-8 text-center text-xs md:text-sm text-gray-400 font-mono"
         >
-          <p>[ INITIALIZING NEURAL NETWORK ]</p>
+          <p className="text-neon-cyan/70 drop-shadow-[0_0_4px_rgba(0,212,255,0.3)]">
+            [ INITIALIZING NEURAL NETWORK ]
+          </p>
           <div className="flex justify-center gap-2 mt-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse"></span>
+            <span className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse shadow-[0_0_8px_#39ff14]"></span>
             <span
-              className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse"
+              className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse shadow-[0_0_8px_#39ff14]"
               style={{ animationDelay: "0.2s" }}
             ></span>
             <span
-              className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse"
+              className="inline-block w-2 h-2 rounded-full bg-neon-green animate-pulse shadow-[0_0_8px_#39ff14]"
               style={{ animationDelay: "0.4s" }}
             ></span>
           </div>
@@ -134,7 +137,7 @@ const Landing: React.FC<LandingProps> = ({ onEnter }) => {
 
       {/* Decorative Elements */}
       <motion.div
-        className="absolute top-20 left-10 text-neon-cyan opacity-20 font-mono text-xs"
+        className="absolute top-20 left-10 text-neon-cyan/30 font-mono text-xs drop-shadow-[0_0_4px_rgba(0,212,255,0.3)]"
         animate={{ y: [0, 20, 0] }}
         transition={{ duration: 4, repeat: Infinity }}
       >

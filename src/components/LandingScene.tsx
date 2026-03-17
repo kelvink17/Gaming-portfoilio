@@ -1,177 +1,181 @@
-// "use client";
-
-// import React, { useRef, useEffect } from "react";
-// import { Canvas, useFrame, useThree } from "@react-three/fiber";
-// import {
-//   OrbitControls,
-//   Text,
-//   Sphere,
-//   MeshDistortMaterial,
-// } from "@react-three/drei";
-// import * as THREE from "three";
-// import gsap from "gsap";
-
-// function RotatingMesh() {
-//   const meshRef = useRef<THREE.Group>(null);
-
-//   useFrame(() => {
-//     if (meshRef.current) {
-//       meshRef.current.rotation.x += 0.001;
-//       meshRef.current.rotation.y += 0.002;
-//     }
-//   });
-
-//   return (
-//     <group ref={meshRef}>
-//       <Sphere args={[2, 100, 100]} position={[0, 0, 0]}>
-//         <MeshDistortMaterial
-//           color="#00d4ff"
-//           speed={2}
-//           distort={0.6}
-//           emissive="#00d4ff"
-//           emissiveIntensity={0.5}
-//         />
-//       </Sphere>
-
-//       <mesh position={[0, 0, 0]}>
-//         <torusGeometry args={[2.5, 0.2, 16, 100]} />
-//         <meshPhongMaterial
-//           color="#b026ff"
-//           wireframe={false}
-//           emissive="#b026ff"
-//           emissiveIntensity={0.3}
-//         />
-//       </mesh>
-
-//       <mesh position={[0, 0, 0]} rotation={[Math.PI / 4, 0, 0]}>
-//         <torusGeometry args={[3, 0.15, 16, 100]} />
-//         <meshPhongMaterial
-//           color="#ff006e"
-//           wireframe={false}
-//           emissive="#ff006e"
-//           emissiveIntensity={0.3}
-//         />
-//       </mesh>
-//     </group>
-//   );
-// }
-
-// function CameraControl() {
-//   const { camera } = useThree();
-
-//   useEffect(() => {
-//     camera.position.set(0, 0, 6);
-//   }, [camera]);
-
-//   return null;
-// }
-
-// function LandingScene() {
-//   return (
-//     <Canvas className="w-full h-full" dpr={[1, 2]}>
-//       <CameraControl />
-//       <ambientLight intensity={0.7} />
-//       <pointLight position={[10, 10, 10]} intensity={1} color="#00d4ff" />
-//       <pointLight position={[-10, -10, 10]} intensity={1} color="#b026ff" />
-//       <RotatingMesh />
-//       <OrbitControls autoRotate autoRotateSpeed={0.5} enableZoom={false} />
-//     </Canvas>
-//   );
-// }
-
-// export default LandingScene;
-
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Sphere, MeshDistortMaterial } from "@react-three/drei";
+import {
+  OrbitControls,
+  Sphere,
+  Points,
+  PointMaterial,
+} from "@react-three/drei";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 
-function RotatingMesh() {
-  const meshRef = useRef<THREE.Group>(null);
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+// ------------------------------------------------------------
+// 3D Starfield (floating particles)
+// ------------------------------------------------------------
+function StarField() {
+  const pointsRef = useRef<THREE.Points>(null!);
+  const count = 1500;
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
 
-  // Load image manually to prevent the "Black Screen" / Suspense issue
-  useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-      "/Rema grillz",
-      (tex) => {
-        setTexture(tex);
-      },
-      undefined,
-      (err) => {
-        console.error(
-          "Image failed to load. Check if 'me.png' is in /public",
-          err,
-        );
-      },
-    );
-  }, []);
+  for (let i = 0; i < count; i++) {
+    // Random sphere distribution
+    const r = 5 + Math.random() * 5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = r * Math.sin(phi) * Math.sin(theta);
+    const z = r * Math.cos(phi);
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = z;
+
+    // Random neon colors
+    const color = new THREE.Color().setHSL(Math.random(), 0.8, 0.6);
+    colors[i * 3] = color.r;
+    colors[i * 3 + 1] = color.g;
+    colors[i * 3 + 2] = color.b;
+  }
 
   useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x += 0.001;
-      meshRef.current.rotation.y += 0.002;
-    }
+    pointsRef.current.rotation.y += 0.0002;
   });
 
   return (
-    <group ref={meshRef}>
-      <Sphere args={[2, 100, 100]} position={[0, 0, 0]}>
-        <MeshDistortMaterial
-          map={texture} // Only applies once loaded
-          color={texture ? "white" : "#00d4ff"} // Blue until image loads, then white
-          speed={2}
-          distort={0.6}
+    <Points ref={pointsRef} positions={positions} colors={colors}>
+      <PointMaterial
+        size={0.1}
+        vertexColors
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </Points>
+  );
+}
+
+// ------------------------------------------------------------
+// Main 3D scene – reacts to mouse
+// ------------------------------------------------------------
+function SceneContent() {
+  const groupRef = useRef<THREE.Group>(null!);
+  const { mouse } = useThree();
+
+  useFrame(() => {
+    // Subtle rotation based on mouse position
+    groupRef.current.rotation.y += 0.001;
+    groupRef.current.rotation.x = mouse.y * 0.2;
+    groupRef.current.rotation.y += mouse.x * 0.1;
+  });
+
+  return (
+    <group ref={groupRef}>
+      {/* Central glowing sphere (gaming/football vibe) */}
+      <Sphere args={[2, 64, 64]} position={[0, 0, 0]}>
+        <meshStandardMaterial
+          color="#ffffff"
           emissive="#00d4ff"
-          emissiveIntensity={0.2}
+          emissiveIntensity={0.6}
+          roughness={0.2}
+          metalness={0.1}
         />
       </Sphere>
 
-      {/* Your original Torus Rings */}
-      <mesh position={[0, 0, 0]}>
-        <torusGeometry args={[2.5, 0.2, 16, 100]} />
-        <meshPhongMaterial
+      {/* Outer rotating torus knots */}
+      <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
+        <torusKnotGeometry args={[2.5, 0.3, 100, 16]} />
+        <meshStandardMaterial
           color="#b026ff"
           emissive="#b026ff"
-          emissiveIntensity={0.3}
+          emissiveIntensity={0.8}
+          wireframe
         />
       </mesh>
 
-      <mesh position={[0, 0, 0]} rotation={[Math.PI / 4, 0, 0]}>
-        <torusGeometry args={[3, 0.15, 16, 100]} />
-        <meshPhongMaterial
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusKnotGeometry args={[3, 0.2, 100, 16]} />
+        <meshStandardMaterial
           color="#ff006e"
           emissive="#ff006e"
-          emissiveIntensity={0.3}
+          emissiveIntensity={0.6}
+          wireframe
         />
       </mesh>
+
+      {/* Floating cubes around the ball */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        const radius = 3.8;
+        return (
+          <mesh
+            key={i}
+            position={[
+              Math.cos(angle) * radius,
+              Math.sin(angle) * radius * 0.5,
+              0,
+            ]}
+            scale={0.2}
+          >
+            <boxGeometry />
+            <meshStandardMaterial
+              color="#39ff14"
+              emissive="#39ff14"
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
 
-function CameraControl() {
+// ------------------------------------------------------------
+// Camera setup
+// ------------------------------------------------------------
+function CameraController() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(0, 0, 6);
+    camera.position.set(0, 1, 8);
   }, [camera]);
   return null;
 }
 
+// ------------------------------------------------------------
+// Main export
+// ------------------------------------------------------------
 export default function LandingScene() {
   return (
     <div className="w-full h-full bg-transparent">
-      <Canvas dpr={[1, 2]}>
-        <CameraControl />
-        <ambientLight intensity={0.7} />
-        <pointLight position={[10, 10, 10]} intensity={1} color="#00d4ff" />
-        <pointLight position={[-10, -10, 10]} intensity={1} color="#b026ff" />
+      <Canvas dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
+        <color attach="background" args={["#050510"]} />
+        <CameraController />
+        <ambientLight intensity={0.4} />
+        <pointLight position={[5, 5, 5]} intensity={1.5} color="#00d4ff" />
+        <pointLight position={[-5, -3, 5]} intensity={1.2} color="#b026ff" />
+        <pointLight position={[3, -5, 5]} intensity={1} color="#ff006e" />
 
-        <RotatingMesh />
+        <SceneContent />
+        <StarField />
 
-        <OrbitControls autoRotate autoRotateSpeed={0.5} enableZoom={false} />
+        <OrbitControls
+          autoRotate
+          autoRotateSpeed={0.8}
+          enableZoom={false}
+          enablePan={false}
+          enableDamping
+          dampingFactor={0.05}
+        />
+
+        {/* Bloom effect for that neon glow */}
+        <EffectComposer>
+          <Bloom
+            luminanceThreshold={0.2}
+            luminanceSmoothing={0.9}
+            intensity={1.5}
+          />
+        </EffectComposer>
       </Canvas>
     </div>
   );
