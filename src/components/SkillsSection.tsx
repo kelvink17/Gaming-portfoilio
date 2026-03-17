@@ -14,14 +14,20 @@ interface Skill {
 
 const SkillsSection: React.FC = () => {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
-
   const skills: Skill[] = [
     {
       name: "React",
-      level: 95,
+      level: 92,
       icon: "⚛️",
       color: "from-cyan-500",
       hex: "#06b6d4",
+    },
+    {
+      name: "TypeScript",
+      level: 85,
+      icon: "📘",
+      color: "from-blue-600",
+      hex: "#2563eb",
     },
     {
       name: "Vite",
@@ -33,33 +39,67 @@ const SkillsSection: React.FC = () => {
     {
       name: "Node.js",
       level: 88,
-      icon: "🔗",
+      icon: "🟢",
       color: "from-green-500",
       hex: "#22c55e",
     },
     {
-      name: "Express",
-      level: 87,
-      icon: "🛣️",
+      name: "Express.js",
+      level: 86,
+      icon: "🚀",
       color: "from-yellow-500",
       hex: "#eab308",
     },
     {
-      name: "MongoDB",
-      level: 85,
-      icon: "🗄️",
-      color: "from-pink-500",
-      hex: "#ec4899",
+      name: "MongoDB / Atlas",
+      level: 87,
+      icon: "🍃",
+      color: "from-emerald-500",
+      hex: "#10b981",
     },
     {
-      name: "Multer",
-      level: 92,
-      icon: "📤",
-      color: "from-blue-500",
-      hex: "#3b82f6",
+      name: "REST API Development",
+      level: 84,
+      icon: "🔗",
+      color: "from-indigo-500",
+      hex: "#6366f1",
+    },
+    {
+      name: "Authentication (JWT)",
+      level: 82,
+      icon: "🔐",
+      color: "from-red-500",
+      hex: "#ef4444",
+    },
+    {
+      name: "Java",
+      level: 75,
+      icon: "☕",
+      color: "from-amber-500",
+      hex: "#f59e0b",
+    },
+    {
+      name: ".NET / C#",
+      level: 78,
+      icon: "💠",
+      color: "from-violet-500",
+      hex: "#8b5cf6",
+    },
+    {
+      name: "Flutter",
+      level: 65,
+      icon: "📱",
+      color: "from-sky-500",
+      hex: "#0ea5e9",
+    },
+    {
+      name: "Deployment (Render / Vercel)",
+      level: 80,
+      icon: "🌍",
+      color: "from-orange-500",
+      hex: "#f97316",
     },
   ];
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
