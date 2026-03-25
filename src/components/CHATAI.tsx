@@ -36,10 +36,12 @@ const CHATAI = () => {
     setLoading(true);
 
     try {
-      // TO:
+      // In your React Frontend (CHATAI.tsx)
       const res = await axios.post(
         "https://kelvin-ai-backend.onrender.com/api/chat",
-        { prompt: currentInput },
+        {
+          prompt: currentInput,
+        },
       );
       // const res = await axios.post("http://localhost:5000/api/chat", {
       //   prompt: currentInput,
