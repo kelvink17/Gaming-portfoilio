@@ -6,7 +6,17 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(
+  cors({
+    origin: [
+      "https://your-vercel-site-name.vercel.app",
+      "http://localhost:5173",
+    ], // Add your live URL here
+    methods: ["GET", "POST"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 const apiKey = process.env.GEMINI_API_KEY;
