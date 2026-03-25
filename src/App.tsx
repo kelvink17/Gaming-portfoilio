@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Landing from "./components/Landing";
 import Dashboard from "./components/Dashboard";
+import CHATAI from "./components/CHATAI"; // Already imported!
 import gsap from "gsap";
 
-// FIX: Define explicit HEX codes so Framer/GSAP don't guess
 const COLORS = {
   cyan: "#00f3ff",
   purple: "#bc13fe",
@@ -20,19 +20,11 @@ function App() {
 
   const handleEnter = () => {
     setIsEntering(true);
-
     const tl = gsap.timeline();
-    tl.to("body", {
-      duration: 0.5,
-      backgroundColor: COLORS.dark, // Use constant
-    })
+    tl.to("body", { duration: 0.5, backgroundColor: COLORS.dark })
       .to(
         ".transition-overlay",
-        {
-          duration: 1.2,
-          scaleY: 1,
-          ease: "power2.inOut",
-        },
+        { duration: 1.2, scaleY: 1, ease: "power2.inOut" },
         0.3,
       )
       .to(".transition-overlay", {
@@ -50,7 +42,6 @@ function App() {
 
   return (
     <div className="w-full h-screen overflow-hidden bg-black">
-      {/* Transition Overlay - Using Inline Style for the gradient colors to be safe */}
       <motion.div
         className="transition-overlay fixed inset-0 z-50 origin-top pointer-events-none"
         style={{
@@ -80,33 +71,26 @@ function App() {
         )}
       </AnimatePresence>
 
+      {/* --- BACKGROUND BLOBS --- */}
       <motion.div
         className="fixed top-1/4 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
         style={{ backgroundColor: COLORS.cyan, opacity: 0.3 }}
-        animate={{
-          y: [0, 50, 0],
-          x: [0, -30, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        animate={{ y: [0, 50, 0], x: [0, -30, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-
       <motion.div
         className="fixed bottom-1/4 left-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
         style={{ backgroundColor: COLORS.purple, opacity: 0.3 }}
-        animate={{
-          y: [0, -50, 0],
-          x: [0, 30, 0],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
+        animate={{ y: [0, -50, 0], x: [0, 30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
+
+      {/* --- PUT THE AI CHAT HERE --- */}
+      {showDashboard && (
+        <div className="relative z-[60]">
+          <CHATAI />
+        </div>
+      )}
     </div>
   );
 }

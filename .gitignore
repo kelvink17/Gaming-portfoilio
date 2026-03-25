@@ -10,3 +10,9 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
+
+node_modules
+.env
+.DS_Store
+dist
+build
