@@ -29,28 +29,29 @@ const CHATAI = () => {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    // 🛠️ THE SMART SWITCH
+    // If you are on your laptop, use localhost. If you are live, use Render.
+    const API_URL =
+      window.location.hostname === "localhost"
+        ? "http://localhost:5000/api/chat"
+        : "https://kelvin-ai-backend.onrender.com/api/chat";
+
     const userMsg = { role: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
-    const currentInput = input;
     setInput("");
     setLoading(true);
 
     try {
-      // In your React Frontend (CHATAI.tsx)
-      const res = await axios.post(
-        "https://kelvin-ai-backend.onrender.com/api/chat",
-        {
-          prompt: currentInput,
-        },
-      );
-      // const res = await axios.post("http://localhost:5000/api/chat", {
-      //   prompt: currentInput,
-      // });
+      const res = await axios.post(API_URL, { prompt: input }); // Use the Smart URL
       setMessages((prev) => [...prev, { role: "ai", text: res.data.text }]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: "Omo, server is down. Check backend!" },
+        {
+          role: "ai",
+          text: "Omo, the connection failed. check backend",
+        },
       ]);
     }
     setLoading(false);

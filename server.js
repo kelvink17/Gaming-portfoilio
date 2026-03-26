@@ -9,12 +9,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "https://your-vercel-site-name.vercel.app",
-      "http://localhost:5173",
-    ], // Add your live URL here
+    origin: "*",
     methods: ["GET", "POST"],
-    credentials: true,
+    allowedHeaders: ["Content-Type"],
   }),
 );
 app.use(express.json());
@@ -26,7 +23,12 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
-const MODEL_NAME = "gemini-2.5-flash"; // ✅ correct model name
+const MODEL_NAME = "gemini-2.5-flash"; // ✅ Corrected from 2.5 to 1.5
+
+// ✅ Health Check: This stops the "Cannot GET /" error on Render
+app.get("/", (req, res) => {
+  res.send("Kelvin's Digital Brain is Online! 🤖⚡");
+});
 
 app.post("/api/chat", async (req, res) => {
   const { prompt } = req.body;
@@ -220,9 +222,12 @@ Tone:
     res.json({ text: responseText });
   } catch (err) {
     console.error("Gemini API error:", err);
-    res
-      .status(500)
-      .json({ error: "Omo, something went wrong. Check server logs." });
+    let errorMessage = "Omo, something went wrong. Check server logs.";
+    if (err.status === 429) {
+      errorMessage =
+        "Kelvin is resting o! Free AI quota don finish. Try again later or upgrade to get more answers. 🙏";
+    }
+    res.status(err.status === 429 ? 429 : 500).json({ error: errorMessage });
   }
 });
 
