@@ -15,7 +15,7 @@ const CHATAI = () => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false); // NEW: Toggle state
 
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
