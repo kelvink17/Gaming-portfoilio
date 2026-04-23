@@ -152,8 +152,23 @@ const SkillsSection: React.FC = () => {
     },
   ];
 
+  const playClickSound = () => {
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(800, context.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.05, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(context.destination);
+    osc.start();
+    osc.stop(context.currentTime + 0.1);
+  };
+
   return (
-    <div className="w-full space-y-12 pb-20 font-mono text-white selection:bg-neon-cyan selection:text-black">
+    <div className="w-full max-w-screen-2xl mx-auto space-y-12 pb-20 font-mono text-white selection:bg-neon-cyan selection:text-black">
       {/* --- PROFILE & HEADER SECTION --- */}
       <div className="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
         {/* GAMING PLAYER CARD */}
@@ -249,7 +264,7 @@ const SkillsSection: React.FC = () => {
       </div>
 
       {/* --- SKILLS GRID --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
         {skills.map((skill, i) => (
           <motion.div
             key={skill.name}

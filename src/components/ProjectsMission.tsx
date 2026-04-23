@@ -175,6 +175,21 @@ const ProjectsMission: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const playClickSound = () => {
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(800, context.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.05, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(context.destination);
+    osc.start();
+    osc.stop(context.currentTime + 0.1);
+  };
+
   // Track mouse for 3D tilt effect
   useEffect(() => {
     const handleMouse = (e: MouseEvent) => {
@@ -349,7 +364,7 @@ const ProjectsMission: React.FC = () => {
         </div>
 
         {/* Mission List */}
-        <div className="space-y-4 md:space-y-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8 max-w-screen-2xl mx-auto pb-20">
           {missions.map((m) => {
             const isSelected = selectedMission === m.id;
             const diffColor = difficultyColor[m.difficulty];
@@ -425,9 +440,10 @@ const ProjectsMission: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={() =>
-                          setSelectedMission(isSelected ? null : m.id)
-                        }
+                        onClick={() => {
+                          playClickSound();
+                          setSelectedMission(isSelected ? null : m.id);
+                        }}
                         className={`w-full md:w-auto h-12 md:h-14 px-8 font-black uppercase text-[10px] tracking-[0.2em] transition-all duration-300 relative overflow-hidden group/btn ${
                           isSelected
                             ? "bg-neon-cyan text-black"

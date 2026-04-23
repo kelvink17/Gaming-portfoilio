@@ -94,7 +94,7 @@ const ContactPage: React.FC = () => {
       <div className="absolute inset-0 pointer-events-none z-10 bg-scanline opacity-10" />
 
       {/* Main content */}
-      <div className="relative z-20 p-4 md:p-8 max-w-7xl mx-auto">
+      <div className="relative z-20 p-4 md:p-8 max-w-screen-2xl mx-auto">
         {/* Header with glitch effect */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

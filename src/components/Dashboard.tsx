@@ -17,20 +17,34 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // --- AUDIO LOGIC ---
+  const playClickSound = () => {
+    // Synthesize a digital click sound using AudioContext
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    
+    osc.type = "square";
+    osc.frequency.setValueAtTime(800, context.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.1);
+    
+    gain.gain.setValueAtTime(0.05, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+    
+    osc.connect(gain);
+    gain.connect(context.destination);
+    
+    osc.start();
+    osc.stop(context.currentTime + 0.1);
+  };
+
   const playExitSound = () => {
-    // Ensure you have exit.mp3 in public/sounds/
-    const audio = new Audio("/sounds/exit.mp3");
+    const audio = new Audio("/exit.mp3");
     audio.volume = 0.4;
-    audio
-      .play()
-      .catch((e) =>
-        console.log("Audio play blocked until user interaction", e),
-      );
+    audio.play().catch((e) => console.log("Audio play blocked", e));
   };
 
   const handleExit = () => {
     playExitSound();
-    // Short delay to let the sound play before navigation
     setTimeout(() => {
       window.location.href = "/";
     }, 400);
@@ -60,7 +74,10 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
       {/* Mobile Menu Toggle */}
       <div className="md:hidden absolute top-4 left-4 z-50 flex gap-2">
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => {
+            playClickSound();
+            setSidebarOpen(!sidebarOpen);
+          }}
           className="p-2 rounded bg-neon-cyan/10 border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/20"
         >
           {sidebarOpen ? "✕" : "☰"}
@@ -137,6 +154,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
             <motion.button
               key={item.id}
               onClick={() => {
+                playClickSound();
                 setCurrentPage(item.id as PageType);
                 setSidebarOpen(false);
               }}
@@ -180,7 +198,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transitionComplete }) => {
         animate={transitionComplete ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
       >
-        <div className="p-6 md:p-12 min-h-screen max-w-7xl mx-auto">
+        <div className="p-6 md:p-12 min-h-screen max-w-screen-2xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPage}

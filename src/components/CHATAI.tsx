@@ -2,7 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion"; // Optional: for smooth pop-up
+import { motion, AnimatePresence } from "framer-motion";
+import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+
+// Types for Web Speech API
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+    SpeechRecognition: any;
+  }
+}
 
 const CHATAI = () => {
   const WELCOME_MESSAGE = {
@@ -13,9 +22,12 @@ const CHATAI = () => {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // NEW: Toggle state
+  const [isOpen, setIsOpen] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,34 +37,99 @@ const CHATAI = () => {
     if (isOpen) scrollToBottom();
   }, [messages, loading, isOpen]);
 
-  const clearChat = () => setMessages([WELCOME_MESSAGE]);
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = "en-US";
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
+
+  const speak = (text: string) => {
+    if (!isSpeaking) return;
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    
+    // Optional: Select a specific voice (e.g., a cool robotic one)
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.name.includes("Google UK English Male") || v.name.includes("Male"));
+    if (preferredVoice) utterance.voice = preferredVoice;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const clearChat = () => {
+    window.speechSynthesis.cancel();
+    setMessages([WELCOME_MESSAGE]);
+  };
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    const messageToSend = input.trim();
+    if (!messageToSend) return;
 
-    // 🛠️ THE SMART SWITCH
-    // If you are on your laptop, use localhost. If you are live, use Render.
     const API_URL =
       window.location.hostname === "localhost"
         ? "http://localhost:5000/api/chat"
         : "https://kelvin-ai-backend.onrender.com/api/chat";
 
-    const userMsg = { role: "user", text: input };
+    const userMsg = { role: "user", text: messageToSend };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
 
     try {
-      const res = await axios.post(API_URL, { prompt: input }); // Use the Smart URL
-      setMessages((prev) => [...prev, { role: "ai", text: res.data.text }]);
+      const res = await axios.post(API_URL, { prompt: messageToSend });
+      const aiText = res.data.text;
+      setMessages((prev) => [...prev, { role: "ai", text: aiText }]);
+      speak(aiText);
     } catch (err) {
+      const errorText = "Omo, the connection failed. check backend";
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          text: "Omo, the connection failed. check backend",
+          text: errorText,
         },
       ]);
+      speak(errorText);
     }
     setLoading(false);
   };
@@ -73,16 +150,26 @@ const CHATAI = () => {
               <div className="flex items-center gap-2">
                 <span className="text-sm">Kelvin AI 🤖</span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => setIsSpeaking(!isSpeaking)}
+                  className="text-white/80 hover:text-white transition-colors"
+                  title={isSpeaking ? "Mute Bot" : "Unmute Bot"}
+                >
+                  {isSpeaking ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </button>
                 <button
                   onClick={clearChat}
-                  className="text-[10px] bg-white/10 px-2 py-1 rounded-md"
+                  className="text-[10px] bg-white/10 px-2 py-1 rounded-md hover:bg-white/20 transition-colors"
                 >
                   Clear
                 </button>
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg leading-none"
+                  onClick={() => {
+                    setIsOpen(false);
+                    window.speechSynthesis.cancel();
+                  }}
+                  className="text-xl leading-none hover:text-red-400 transition-colors"
                 >
                   ×
                 </button>
@@ -116,17 +203,33 @@ const CHATAI = () => {
             </div>
 
             {/* Input */}
-            <div className="p-3 bg-slate-900 border-t border-white/10 flex gap-2">
+            <div className="p-3 bg-slate-900 border-t border-white/10 flex gap-2 items-center">
+              <button
+                onClick={toggleListening}
+                className={`p-2 rounded-xl transition-all duration-300 ${
+                  isListening 
+                    ? "bg-red-500/20 text-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" 
+                    : "bg-slate-800 text-slate-400 hover:text-blue-400"
+                }`}
+                title={isListening ? "Listening..." : "Voice Command"}
+              >
+                {isListening ? <Mic size={20} /> : <MicOff size={20} />}
+              </button>
               <input
                 className="flex-1 bg-slate-800 outline-none text-white text-xs p-2 rounded-xl border border-transparent focus:border-blue-500"
-                placeholder="Message..."
+                placeholder={isListening ? "Listening..." : "Message..."}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               />
               <button
                 onClick={sendMessage}
-                className="bg-blue-600 text-white w-8 h-8 rounded-lg"
+                disabled={!input.trim()}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                  input.trim() 
+                    ? "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_10px_rgba(37,99,235,0.4)]" 
+                    : "bg-slate-800 text-slate-600"
+                }`}
               >
                 ➔
               </button>
@@ -137,11 +240,14 @@ const CHATAI = () => {
 
       {/* --- THE TOGGLE BUTTON (FAB) --- */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (isOpen) window.speechSynthesis.cancel();
+        }}
         className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 active:scale-90 ${
           isOpen
             ? "bg-slate-800 rotate-90"
-            : "bg-gradient-to-tr from-blue-600 to-purple-600 hover:scale-110"
+            : "bg-gradient-to-tr from-blue-600 to-purple-600 hover:scale-110 shadow-[0_0_20px_rgba(37,99,235,0.4)]"
         }`}
       >
         {isOpen ? (
@@ -158,3 +264,4 @@ const CHATAI = () => {
 };
 
 export default CHATAI;
+
